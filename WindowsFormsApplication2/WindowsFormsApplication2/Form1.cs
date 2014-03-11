@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Serialization;
+using DevExpress.XtraReports.UI;
 
 namespace WindowsFormsApplication2
 {
@@ -18,6 +19,7 @@ namespace WindowsFormsApplication2
         {
             InitializeComponent();
         }
+
 
         private void trackBar1_Scroll(object sender, EventArgs e)
         {
@@ -53,49 +55,55 @@ namespace WindowsFormsApplication2
             if (result==DialogResult.OK)
             {
                 var fileName = sfd.FileName;
-                AppData ad = new AppData();
-                if (radioButton1.Checked)
-                    ad.exp = Exp.one;
-                else
-                    if (radioButton2.Checked)
-                        ad.exp = Exp.three;
-                    else
-                        ad.exp = Exp.five;
-                if (radioButton4.Checked)
-                    ad.worktime = WorkTime.five;
-                else
-                    if (radioButton5.Checked)
-                        ad.worktime = WorkTime.twotwo;
-                    else
-                        ad.worktime = WorkTime.onethree;
-                if (radioButton7.Checked) ad.drivelicense = DriveLicense.A;
-                if (radioButton8.Checked) ad.drivelicense = DriveLicense.B;
-                if (radioButton9.Checked) ad.drivelicense = DriveLicense.C;
-                if (radioButton10.Checked) ad.drivelicense = DriveLicense.D;
-                if (radioButton11.Checked) ad.drivelicense = DriveLicense.E;
-                if (radioButton12.Checked) ad.drivelicense = DriveLicense.No;
-                if (checkBox1.Checked)
-                    ad.alc = Alc.on;
-                else
-                    ad.alc = Alc.off;
-                if (checkBox2.Checked)
-                    ad.smoke = Smoke.on;
-                else
-                    ad.smoke = Smoke.off;
-
-                ad.Educ = new List<EducData>();
-                foreach (EducData ed in listBox1.Items)
-                {
-                    ad.Educ.Add(ed);
-                }
-
-                ad.AAge = trackBar1.Value;
+                var ad = CreateAppData();
 
              XmlSerializer xs = new XmlSerializer(typeof(AppData));
                 var fileStream = File.Create(fileName);
                 xs.Serialize(fileStream, ad);
                 fileStream.Close();
             }
+        }
+
+        private AppData CreateAppData()
+        {
+             AppData ad = new AppData();
+            if (radioButton1.Checked)
+                ad.exp = Exp.one;
+            else
+                if (radioButton2.Checked)
+                    ad.exp = Exp.three;
+                else
+                    ad.exp = Exp.five;
+            if (radioButton4.Checked)
+                ad.worktime = WorkTime.five;
+            else
+                if (radioButton5.Checked)
+                    ad.worktime = WorkTime.twotwo;
+                else
+                    ad.worktime = WorkTime.onethree;
+            if (radioButton7.Checked) ad.drivelicense = DriveLicense.A;
+            if (radioButton8.Checked) ad.drivelicense = DriveLicense.B;
+            if (radioButton9.Checked) ad.drivelicense = DriveLicense.C;
+            if (radioButton10.Checked) ad.drivelicense = DriveLicense.D;
+            if (radioButton11.Checked) ad.drivelicense = DriveLicense.E;
+            if (radioButton12.Checked) ad.drivelicense = DriveLicense.Отсутствует;
+            if (checkBox1.Checked)
+                ad.alc = Alc.on;
+            else
+                ad.alc = Alc.off;
+            if (checkBox2.Checked)
+                ad.smoke = Smoke.on;
+            else
+                ad.smoke = Smoke.off;
+
+            ad.Educ = new List<EducData>();
+            foreach (EducData ed in listBox1.Items)
+            {
+                ad.Educ.Add(ed);
+            }
+
+            ad.AAge = trackBar1.Value;
+            return ad;
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -121,7 +129,7 @@ namespace WindowsFormsApplication2
                 radioButton9.Checked = ad.drivelicense == DriveLicense.C;
                 radioButton10.Checked = ad.drivelicense == DriveLicense.D;
                 radioButton11.Checked = ad.drivelicense == DriveLicense.E;
-                radioButton12.Checked = ad.drivelicense == DriveLicense.No;
+                radioButton12.Checked = ad.drivelicense == DriveLicense.Отсутствует;
                 checkBox1.Checked = ad.smoke == Smoke.on;
                 checkBox2.Checked = ad.alc == Alc.on;
                 listBox1.Items.Clear();
@@ -133,6 +141,23 @@ namespace WindowsFormsApplication2
             }
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            var pr = new AppReport();
+            AppData ad = CreateAppData();
+            pr.DataSource = new BindingSource() { DataSource = ad };
+            pr.ShowPreview();
+        }
+
+        private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
+        {
+
+        }
+
+        private void textBox3_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
    public class AppData
     {
@@ -143,6 +168,41 @@ namespace WindowsFormsApplication2
         public Alc alc { get; set; }
         public List<EducData> Educ { get; set; }
         public int AAge { get; set; }
+
+        [XmlIgnore]
+        public string CHarm
+        {
+            get
+            {
+                if (alc == Alc.on) return "Вредные привычки: Алкоголь.";
+                if (smoke == Smoke.on) return "Вредные привычки: Курение.";
+                return "Без вредных привычек.";
+
+            }
+        }
+        [XmlIgnore]
+        public string CWorkTime
+        {
+            get
+            {
+                if (worktime == WorkTime.five) return "Желаемое время работы: 5 дней в неделю.";
+                if (worktime == WorkTime.onethree) return "Желаемое время работы: сутки через трое.";
+                return "Желаемое время работы: два через два.";
+            }
+        }
+        [XmlIgnore]
+        public string CExp
+        {
+            get
+            {
+                if (exp == Exp.five) return "Опыт работы более 5 лет.";
+                if (exp == Exp.one) return "Опыт работы от 1 до 3 лет.";
+                return "Опыт работы от 3 до 5 лет.";
+            }
+        }
+        [XmlIgnore]
+        public int TotalEduc { get { return Educ.Count; } }
+
     }   
       public class AAgeData
       {  
@@ -168,7 +228,7 @@ namespace WindowsFormsApplication2
         C,
         D,
         E,
-        No
+        Отсутствует
     }
 
       public class EducData
