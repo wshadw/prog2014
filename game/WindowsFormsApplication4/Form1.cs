@@ -78,8 +78,6 @@ namespace WindowsFormsApplication4
             label1.Text = "Ваш счёт: " + Math.Round(score, 0);
             label2.Text = "Жизни: " + lives;
             label6.Text = "";
-
-
         }
 
         private void pictureBox1_Click(object sender, EventArgs e)
@@ -159,11 +157,14 @@ namespace WindowsFormsApplication4
             }
             if (lives==0)
             {
-                label3.Text="Вы проиграли!"; 
+                label3.Text="Вы проиграли!";
+                timer1.Stop();
+                timer2.Stop();
                 timer5.Stop();
                 var res = MessageBox.Show("Начать сналчала?", "Вы проиграли!", MessageBoxButtons.YesNo);
                 if (res == DialogResult.Yes)
                 {
+                    sl = sr = 0;
                     score = 0;
                     difficult=1;
                     lives = 3;
@@ -171,7 +172,9 @@ namespace WindowsFormsApplication4
                     temp2 = 0;
                     spd = 1;
                     count = 0;
-                    label3.Text="";
+                    CountTimer = 0;
+                    label6.Text = "";
+                    label3.Text = "";
                     timer5.Start();
                 }
             }
@@ -187,6 +190,11 @@ namespace WindowsFormsApplication4
             lives = 3;
             count = 0;
             timer5.Start();
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }
