@@ -15,12 +15,13 @@ namespace WindowsFormsApplication4
 {
     public partial class Form1 : Form
     {
+        public int pause = 0;
         public int fly = 0;
         public int obuchenie=0;
         public int scor = 0;
         public int scorefile = 0;
         public int CountTimer = 0;
-        public int sb = 2;
+        public int sb = 2, sb2 = 2;
         public int sr = 0;
         public int sl = 0;
         public float score = 0;
@@ -32,8 +33,9 @@ namespace WindowsFormsApplication4
         public int difficult = 1;
         public int slow = 1;
         public int start = 0;
-
-        float kf = 0;        
+        public int t4 = 0, t6 = 0, t7 = 0;
+        public float kf = 0;
+        private int kfs = 0;
         public Form1()
         {
             InitializeComponent();
@@ -70,7 +72,7 @@ namespace WindowsFormsApplication4
                 {
                     obuchenie = 1;
                     MessageBox.Show("Изменяя размер экрана меняется коэффициент сложности, в зависимости от которого начисляются очки.", "Обучение", MessageBoxButtons.OK);
-
+                    MessageBox.Show("Для того чтобы поставить игру на паузу, необходимо нажать пробел.", "Обучение", MessageBoxButtons.OK);
                     MessageBox.Show("Необходимо собирать красные шарики, пропустив которые теряется жизнь.", "Обучение", MessageBoxButtons.OK);
                 }
             }
@@ -84,59 +86,90 @@ namespace WindowsFormsApplication4
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 
-            if (e.KeyData == Keys.Right) timer1.Start();
-            if (e.KeyData == Keys.Left) timer2.Start();
+            if (e.KeyData == Keys.Right&&pause==0) timer1.Start();
+            if (e.KeyData == Keys.Left&&pause==0) timer2.Start();
         }
         private void Form1_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
         {
          if (e.KeyData == Keys.Right) timer1.Stop();
          if (e.KeyData == Keys.Left) timer2.Stop();
-         timer5.Start();
+            if (e.KeyData == Keys.Space&&start==1)
+            {
+                if (pause == 0)
+                {
+                    pause = 1;
+                    label3.Text = "      ПАУЗА";
+                    timer1.Stop();
+                    timer2.Stop();
+                    timer4.Stop();
+                    timer5.Stop();
+                    timer6.Stop();
+                    timer7.Stop();
+                }
+                else
+                {
+                    pause = 0;
+                    label3.Text = "";
+                    if(t4==1)timer4.Start();
+                    if(t6==1)timer6.Start();
+                    if(t7==1)timer7.Start();
+                    timer5.Start();
+                }
+            }
+            if (pause==0)timer5.Start();
          sl = sr = 0;
         }
         private void timer1_Tick(object sender, EventArgs e)
         {
             sl++;
-            if (sl < 5) pictureBox1.Left += 2;  else pictureBox1.Left += 2 + spd;
+            if (sl < 8) pictureBox1.Left += 2;  else pictureBox1.Left += (2 + spd*kfs)+(int)((kf*kf)/1.5);
             if (pictureBox1.Left > this.Width - pictureBox1.Width/2) pictureBox1.Left = -pictureBox1.Width/2;
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
             sr++;
-            if (sr < 5) pictureBox1.Left -= 2; else pictureBox1.Left -= (2 + spd);
+            if (sr < 8) pictureBox1.Left -= 2; else pictureBox1.Left -= (2 + spd*kfs)+(int)((kf*kf)/1.5);
             if (pictureBox1.Left < -pictureBox1.Width/2) pictureBox1.Left = this.Width - pictureBox1.Width/2;
         }
 
         private void timer3_Tick(object sender, EventArgs e)
         {
             Random random = new Random(DateTime.Now.Second * DateTime.Now.Millisecond);
-            kf = ((float)this.Width / Height) * ((float)this.Width / Height);
-            label4.Text = "Коэффициент сложности: " + Math.Round(kf, 1);
+            kf = ((float)this.Width / Height) ;
+            label4.Text = "Коэффициент сложности: " + Math.Round(kf*kf, 1);
             label1.Text = "Ваш счёт: " + Math.Round(score, 0);
             label2.Text = "Жизни: " + lives;
             label6.Text = "";
-            if (random.Next(0, 40)==1 && fly==0 && start==1) {
+            kfs=(int)((kf*kf)/1.5);
+            if (kfs < 1) kfs = 1;
+            pictureBox5.Width =(int)(this.Width/8);
+            if (random.Next(0, 29)==1 && fly==0 && start==1&&pause==0) {
                 if (obuchenie == 1 || obuchenie == 2)
                 {
                     start = 0;
                     obuchenie = 3;
                     timer1.Stop();
                     timer2.Stop();
+                    timer4.Stop();
+                    timer7.Stop();
                     timer5.Stop();
                     MessageBox.Show("Синий шарик, бонусный, его ловить не обязательно, он уменьшает скорость падения красных.", "Обучение", MessageBoxButtons.OK);
                     timer5.Start();
+                    if (t4==1)timer4.Start();
+                    if (t7==1)timer7.Start();
                     start = 1;
                 }
                 timer6.Start();
+                t6 = 1;
                 fly = 1;
 
             }
-            if (random.Next(0, 18) == 2 && fly == 0 && start == 1)
+            if (random.Next(0, 15) == 2 && fly == 0 && start == 1&&pause==0)
             {
                 timer7.Start();
                 fly = 1;
-
+                t7 = 1;
             }
         }
 
@@ -154,18 +187,20 @@ namespace WindowsFormsApplication4
             if (pictureBox3.Left > pictureBox1.Left - pictureBox1.Width * 0.15 && pictureBox3.Left < pictureBox1.Left + pictureBox1.Width * 0.85 &&
                 pictureBox3.Top > Height - 100 && pictureBox3.Top < Height - 50)
             {
-                if (spd < 5) spd++;
+                if (spd < 4) spd++;
                 lives++;
                 pictureBox3.Top = -50;
                 pictureBox3.Left = random.Next(0, this.Width - 50);
-                if (spd < 5) label3.Text = "Скорость - х" + spd; else label3.Text = "Скорость MAX";
+                if (spd < 4) label3.Text = "Скорость - х" + spd; else label3.Text = "Скорость MAX";
                 label5.Text = "Жизни - " + lives;
                 CountTimer = 50;
+                t4 = 0;
                 timer4.Stop();
             }
             if (pictureBox3.Top > Height - 30) { 
             pictureBox3.Top = -50;
             pictureBox3.Left = random.Next(0, this.Width - 50);
+                t4 = 0;
             timer4.Stop();
             }
         }
@@ -188,18 +223,22 @@ namespace WindowsFormsApplication4
 
             pictureBox2.Top += 3 + difficult -slow;
             if (pictureBox2.Left > pictureBox1.Left -pictureBox1.Width*0.3 && pictureBox2.Left < pictureBox1.Left + pictureBox1.Width*0.8 &&
-                pictureBox2.Top > Height - 80 && pictureBox2.Top < Height - 60)
+                pictureBox2.Top > Height - 87 && pictureBox2.Top < Height - 60)
             {
                 label6.Text = "+" + Math.Round(100 * kf * difficult, 0);
                 lives++;
                 count++;
-                score = (score/kf + 100 * difficult)*kf;
+                score = (score/(kf) + 100 * difficult)*(kf);
                 popadanie = 1;
 
             }
 
             if (pictureBox2.Top > Height - 30 || popadanie == 1)
             {
+                if (popadanie == 0) {label3.Text = "Промах";
+                    label5.Text = "Жизни - " + (lives-1);
+                    CountTimer = 30;
+                }
                 pictureBox2.Top = -50;
                 pictureBox2.Left = random.Next(0, this.Width - 50);
                 lives--;
@@ -216,7 +255,9 @@ namespace WindowsFormsApplication4
             //    if (spd<5)spd++;
                 if (obuchenie == 1||obuchenie==3)
                 {
-                    
+                    timer4.Stop();
+                    timer6.Stop();
+                    timer7.Stop();
                     timer5.Stop();
                     timer1.Stop();
                     timer2.Stop();
@@ -224,21 +265,29 @@ namespace WindowsFormsApplication4
                     MessageBox.Show("Зелёный шарик, бонусный. Его ловить не обязательно. Он даёт +1 жизнь, +1 к скорости.", "Обучение", MessageBoxButtons.OK);
                     if (obuchenie == 3) obuchenie = 4;
                     else obuchenie = 2;
+                    if (t4==1)timer4.Start();
+                    if (t6==1)timer6.Start();
+                    if (t7==1)timer7.Start();
                     timer5.Start();
                     
                 }
                 timer4.Start();
+                t4 = 1;
             }
             if (lives==0)
             {
                 start = 0;
                 label3.Text="Вы проиграли!";
+                label5.Text = "";
                 timer1.Stop();
                 timer2.Stop();
                 timer4.Stop();
+                t4 = 0;
                 timer5.Stop();
                 timer6.Stop();
+                t6 = 0;
                 timer7.Stop();
+                t7 = 0;
                 scor = (int)Math.Round(score, 0);
                 var fileName = "record.s";
               
@@ -254,6 +303,7 @@ namespace WindowsFormsApplication4
                 var res = MessageBox.Show("Начать сначала?", "Вы проиграли!", MessageBoxButtons.YesNo);
                 if (res == DialogResult.Yes)
                 {
+                    kfs = 0;
                     fly = 0;
                     start = 1;
                     scor = 0;
@@ -267,7 +317,10 @@ namespace WindowsFormsApplication4
                     count = 0;
                     CountTimer = 0;
                     label6.Text = "";
+                    label5.Text = "";
                     label3.Text = "";
+                    pictureBox2.Top = -50;
+                    pictureBox2.Left = random.Next(0, this.Width - 50);
                     pictureBox3.Top = -50;
                     pictureBox3.Left = random.Next(0, this.Width - 50);
                     pictureBox4.Top = -50;
@@ -306,13 +359,6 @@ namespace WindowsFormsApplication4
            
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            lives = 3;
-            count = 0;
-            timer5.Start();
-        }
-
         private void Form1_Load(object sender, EventArgs e)
         {
 
@@ -326,9 +372,9 @@ namespace WindowsFormsApplication4
         private void timer6_Tick(object sender, EventArgs e)
         {
             Random random = new Random(DateTime.Now.Second * DateTime.Now.Millisecond);
-            pictureBox4.Left += sb;
-            pictureBox4.Top += Math.Abs(sb / 2);
-            if (pictureBox4.Left > this.Width - 30 || pictureBox4.Left < 0) sb = -sb;
+            pictureBox4.Left += sb2;
+            pictureBox4.Top += Math.Abs(sb2 / 2);
+            if (pictureBox4.Left > this.Width - 30 || pictureBox4.Left < 0) sb2 = -sb2;
             if (pictureBox4.Left > pictureBox1.Left - pictureBox1.Width * 0.3 && pictureBox4.Left < pictureBox1.Left + pictureBox1.Width * 0.8 &&
                 pictureBox4.Top > Height - 100 && pictureBox4.Top < Height - 50)
             {
@@ -338,6 +384,7 @@ namespace WindowsFormsApplication4
                 label3.Text = "Замедление - х" + slow;
                 CountTimer = 50;
                 fly = 0;
+                t6 = 0;
                 timer6.Stop();
             }
             if (pictureBox4.Top > Height - 30)
@@ -345,6 +392,7 @@ namespace WindowsFormsApplication4
                 pictureBox4.Top = -50;
                 pictureBox4.Left = random.Next(0, this.Width - 50);
                 fly = 0;
+                t6 = 0;
                 timer6.Stop();
             }
         }
@@ -353,8 +401,8 @@ namespace WindowsFormsApplication4
         {
             Random random = new Random(DateTime.Now.Second * DateTime.Now.Millisecond);
             pictureBox5.Top += Math.Abs(sb);
-            if (pictureBox5.Left > pictureBox1.Left - pictureBox1.Width*1.3 && pictureBox5.Left < pictureBox1.Left + pictureBox1.Width &&
-                pictureBox5.Top > Height - 100 && pictureBox5.Top < Height - 40)
+            if (pictureBox5.Left > pictureBox1.Left - pictureBox5.Width+5 && pictureBox5.Left < pictureBox1.Left + pictureBox1.Width &&
+                pictureBox5.Top > Height - 110 && pictureBox5.Top < Height - 50)
             {
                 lives--;
                 pictureBox5.Top = -50;
@@ -363,12 +411,14 @@ namespace WindowsFormsApplication4
                 label5.Text = "Потеря жизни";
                 CountTimer = 50;
                 fly = 0;
+                t7 = 0;
                 timer7.Stop();
             }
             if (pictureBox5.Top > Height - 30)
             {
                 pictureBox5.Top = -50;
                 pictureBox5.Left = random.Next(0, this.Width - pictureBox5.Width);
+                t7 = 0;
                 fly = 0;
                 timer7.Stop();
             }
