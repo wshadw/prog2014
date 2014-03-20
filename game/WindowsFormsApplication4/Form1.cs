@@ -24,6 +24,7 @@ namespace WindowsFormsApplication4
         public int sb = 2, sb2 = 2;
         public int sr = 0;
         public int sl = 0;
+        public int MoveValue = 0, MoveValueL = 3, MoveValueR=3;
         public float score = 0;
         public int count = 0;
         public int lives = 3;
@@ -73,7 +74,7 @@ namespace WindowsFormsApplication4
                     obuchenie = 1;
                     MessageBox.Show("Изменяя размер экрана меняется коэффициент сложности, в зависимости от которого начисляются очки.", "Обучение", MessageBoxButtons.OK);
                     MessageBox.Show("Для того чтобы поставить игру на паузу, необходимо нажать пробел.", "Обучение", MessageBoxButtons.OK);
-                    MessageBox.Show("Необходимо собирать красные шарики, пропустив которые теряется жизнь.", "Обучение", MessageBoxButtons.OK);
+                    MessageBox.Show("Необходимо собирать желтые шарики, пропустив которые теряется жизнь.", "Обучение", MessageBoxButtons.OK);
                 }
             }
             
@@ -91,8 +92,12 @@ namespace WindowsFormsApplication4
         }
         private void Form1_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
         {
-         if (e.KeyData == Keys.Right) timer1.Stop();
-         if (e.KeyData == Keys.Left) timer2.Stop();
+         if (e.KeyData == Keys.Right) {timer1.Stop();
+             MoveValueR = 3;
+         }
+         if (e.KeyData == Keys.Left) {timer2.Stop();
+             MoveValueL = 3;
+         }
             if (e.KeyData == Keys.Space&&start==1)
             {
                 if (pause == 0)
@@ -122,14 +127,25 @@ namespace WindowsFormsApplication4
         private void timer1_Tick(object sender, EventArgs e)
         {
             sl++;
-            if (sl < 8) pictureBox1.Left += 2;  else pictureBox1.Left += (2 + spd*kfs)+(int)((kf*kf)/1.5);
+            if (sl == 2 && MoveValueR < MoveValue)
+            {
+                sl = 0;
+                MoveValueR++;
+            }
+           
+            pictureBox1.Left += MoveValueR;
             if (pictureBox1.Left > this.Width - pictureBox1.Width/2) pictureBox1.Left = -pictureBox1.Width/2;
         }
 
         private void timer2_Tick(object sender, EventArgs e)
         {
             sr++;
-            if (sr < 8) pictureBox1.Left -= 2; else pictureBox1.Left -= (2 + spd*kfs)+(int)((kf*kf)/1.5);
+            if (sr == 2 && MoveValueL < MoveValue)
+            {
+                sr = 0;
+                MoveValueL++;
+            }
+            pictureBox1.Left -= MoveValueL;
             if (pictureBox1.Left < -pictureBox1.Width/2) pictureBox1.Left = this.Width - pictureBox1.Width/2;
         }
 
@@ -142,6 +158,7 @@ namespace WindowsFormsApplication4
             label2.Text = "Жизни: " + lives;
             label6.Text = "";
             kfs=(int)((kf*kf)/1.5);
+            MoveValue = (2 + spd * kfs) + (int)((kf * kf) / 1.5);
             if (kfs < 1) kfs = 1;
             pictureBox5.Width =(int)(this.Width/8);
             if (random.Next(0, 29)==1 && fly==0 && start==1&&pause==0) {
@@ -154,7 +171,7 @@ namespace WindowsFormsApplication4
                     timer4.Stop();
                     timer7.Stop();
                     timer5.Stop();
-                    MessageBox.Show("Синий шарик, бонусный, его ловить не обязательно, он уменьшает скорость падения красных.", "Обучение", MessageBoxButtons.OK);
+                    MessageBox.Show("Красный шарик, бонусный, его ловить не обязательно, он уменьшает скорость падения красных.", "Обучение", MessageBoxButtons.OK);
                     timer5.Start();
                     if (t4==1)timer4.Start();
                     if (t7==1)timer7.Start();
@@ -261,7 +278,7 @@ namespace WindowsFormsApplication4
                     timer5.Stop();
                     timer1.Stop();
                     timer2.Stop();
-                    MessageBox.Show("Вначале каждого уровня скорость движения красных шариков увеличивается, и падает зелёный.", "Обучение", MessageBoxButtons.OK);
+                    MessageBox.Show("Вначале каждого уровня скорость движения желтых шариков увеличивается, и падает зелёный.", "Обучение", MessageBoxButtons.OK);
                     MessageBox.Show("Зелёный шарик, бонусный. Его ловить не обязательно. Он даёт +1 жизнь, +1 к скорости.", "Обучение", MessageBoxButtons.OK);
                     if (obuchenie == 3) obuchenie = 4;
                     else obuchenie = 2;
