@@ -49,6 +49,7 @@
             this.timer6 = new System.Windows.Forms.Timer(this.components);
             this.pictureBox5 = new System.Windows.Forms.PictureBox();
             this.timer7 = new System.Windows.Forms.Timer(this.components);
+            this.label8 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).BeginInit();
@@ -66,11 +67,10 @@
             this.pictureBox1.Size = new System.Drawing.Size(50, 43);
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
-            this.pictureBox1.Click += new System.EventHandler(this.pictureBox1_Click);
             // 
             // timer1
             // 
-            this.timer1.Interval = 1;
+            this.timer1.Interval = 5;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // label1
@@ -85,7 +85,7 @@
             // 
             // timer2
             // 
-            this.timer2.Interval = 1;
+            this.timer2.Interval = 5;
             this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
             // 
             // timer3
@@ -113,7 +113,6 @@
             this.pictureBox2.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox2.TabIndex = 2;
             this.pictureBox2.TabStop = false;
-            this.pictureBox2.Click += new System.EventHandler(this.pictureBox2_Click);
             // 
             // label2
             // 
@@ -124,7 +123,6 @@
             this.label2.Size = new System.Drawing.Size(54, 13);
             this.label2.TabIndex = 3;
             this.label2.Text = "Жизни: 3";
-            this.label2.Click += new System.EventHandler(this.label2_Click);
             // 
             // label3
             // 
@@ -201,7 +199,7 @@
             // 
             // timer6
             // 
-            this.timer6.Interval = 10;
+            this.timer6.Interval = 16;
             this.timer6.Tick += new System.EventHandler(this.timer6_Tick);
             // 
             // pictureBox5
@@ -217,8 +215,19 @@
             // 
             // timer7
             // 
-            this.timer7.Interval = 30;
+            this.timer7.Interval = 42;
             this.timer7.Tick += new System.EventHandler(this.timer7_Tick);
+            // 
+            // label8
+            // 
+            this.label8.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.label8.AutoSize = true;
+            this.label8.ForeColor = System.Drawing.SystemColors.ActiveCaption;
+            this.label8.Location = new System.Drawing.Point(439, 420);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(60, 13);
+            this.label8.TabIndex = 12;
+            this.label8.Text = "by wshadw";
             // 
             // Form1
             // 
@@ -228,24 +237,24 @@
             this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.ClientSize = new System.Drawing.Size(500, 435);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label4);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.label1);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.label3);
             this.Controls.Add(this.pictureBox5);
             this.Controls.Add(this.pictureBox4);
-            this.Controls.Add(this.label7);
-            this.Controls.Add(this.label6);
-            this.Controls.Add(this.label5);
             this.Controls.Add(this.pictureBox3);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.pictureBox2);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label8);
             this.DoubleBuffered = true;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(500, 300);
+            this.MinimumSize = new System.Drawing.Size(500, 400);
             this.Name = "Form1";
             this.Text = "CatchBall";
-            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox3)).EndInit();
@@ -277,6 +286,7 @@
         private System.Windows.Forms.Timer timer6;
         private System.Windows.Forms.PictureBox pictureBox5;
         private System.Windows.Forms.Timer timer7;
+        private System.Windows.Forms.Label label8;
     }
 }
 
