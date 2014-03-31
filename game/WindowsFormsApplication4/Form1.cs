@@ -17,6 +17,7 @@ namespace WindowsFormsApplication4
 {
     public partial class Form1 : Form
     {
+        public int slowbutton = 0;
         public int flagbonuslives = 0;
         public int timerbonuslive = 0;
         public int pause = 0;
@@ -31,18 +32,22 @@ namespace WindowsFormsApplication4
         public int MoveValue = 0, MoveValueL = 3, MoveValueR=3;
         public float score = 0;
         public int count = 0;
+        public int count2 = 0;
         public int lives = 3;
         public int temp1 = 0;
         public int temp2 = 0;
         public int spd = 1;
+        public int moveyelow = 1;
         public int difficult = 1;
         public int slow = 1;
         public int start = 0;
         public int t4 = 0, t6 = 0, t7 = 0;
         public float kf = 0;
         private int kfs = 0;
+        public int energy = 100;
         public int soundonoff = 1;
         public int newrecord = 0;
+        public int mute = 0;
         public Form1()
         {
             InitializeComponent();
@@ -80,8 +85,8 @@ namespace WindowsFormsApplication4
                 {
                     obuchenie = 1;
                     MessageBox.Show("Изменяя размер окна меняется коэффициент сложности, в зависимости от которого начисляются очки.", "Обучение", MessageBoxButtons.OK);
-                    MessageBox.Show("Пробел - пауза.\nS, M - отключение музыки.\nR - начать сначала.", "Обучение", MessageBoxButtons.OK);
-                    MessageBox.Show("Необходимо собирать желтые шарики, пропустив которые теряется жизнь.", "Обучение", MessageBoxButtons.OK);
+                    MessageBox.Show("E - замедление желтых шариков.\nПробел - пауза.\nS - отключение музыки.\nM - отключение звука.\nR - начать сначала.", "Обучение", MessageBoxButtons.OK);
+                    MessageBox.Show("Необходимо собирать желтые шарики ''корзиной'', пропустив которые теряется жизнь. ''Корзина'' так же может двигаться ''сквозь'' стены.", "Обучение", MessageBoxButtons.OK);
                 }
             }
             
@@ -92,8 +97,8 @@ namespace WindowsFormsApplication4
         public WMPLib.WindowsMediaPlayer WMP2 = new WMPLib.WindowsMediaPlayer();
         public WMPLib.WindowsMediaPlayer WMP3 = new WMPLib.WindowsMediaPlayer();
         public WMPLib.WindowsMediaPlayer WMP4 = new WMPLib.WindowsMediaPlayer();
-      
-
+        public WMPLib.WindowsMediaPlayer WMP6 = new WMPLib.WindowsMediaPlayer();
+                           
         private void Form1_KeyDown(object sender, KeyEventArgs e)
         {
 
@@ -118,10 +123,23 @@ namespace WindowsFormsApplication4
                     start = 1;
                 }
             }
+            if (e.KeyData == Keys.E && pause == 0 && start == 1)
+            {
+                if (energy > 9) 
+                {
+                    slowbutton = 1;
+                } 
+                else 
+                { 
+                    label5.Text = "Недостаточно энергии!";
+                    CountTimer = 40;
+                }
+            }
             
         }
         private void Form1_KeyUp(object sender, System.Windows.Forms.KeyEventArgs e)
         {
+            if (e.KeyData == Keys.E) slowbutton = 0;
          if (e.KeyData == Keys.Right) {timer1.Stop();
              MoveValueR = 3;
          }
@@ -133,8 +151,11 @@ namespace WindowsFormsApplication4
                 if (pause == 0)
                 {
                     pause = 1;
-                    WMP3.URL = @"res\pause.wav";
-                    WMP3.controls.play();
+                    if (mute == 0)
+                    {
+                        WMP3.URL = @"res\pause.wav";
+                        WMP3.controls.play();
+                    }
                     label3.Text = "      ПАУЗА";
                     timer1.Stop();
                     timer2.Stop();
@@ -145,8 +166,11 @@ namespace WindowsFormsApplication4
                 }
                 else
                 {
-                    WMP3.URL = @"res\play.wav";
-                    WMP3.controls.play();
+                    if (mute == 0)
+                    {
+                        WMP3.URL = @"res\play.wav";
+                        WMP3.controls.play();
+                    }
                     pause = 0;
                     label3.Text = "";
                     if(t4==1)timer4.Start();
@@ -154,6 +178,10 @@ namespace WindowsFormsApplication4
                     if(t7==1)timer7.Start();
                     timer5.Start();
                 }
+            }
+            if (e.KeyData == Keys.M)
+            {
+                if (mute == 0) mute = 1; else mute = 0;
             }
             if (e.KeyData == Keys.S || e.KeyData == Keys.M)
             {
@@ -164,8 +192,11 @@ namespace WindowsFormsApplication4
                 }
                 else
                 {
-                    soundonoff = 1;
-                    fonsound.PlayLooping();
+                    if (mute == 0)
+                    {
+                        soundonoff = 1;
+                        fonsound.PlayLooping();
+                    }
                 }
             }
             if (e.KeyData == Keys.R) lives = 0;
@@ -183,6 +214,9 @@ namespace WindowsFormsApplication4
            
             pictureBox1.Left += MoveValueR;
             if (pictureBox1.Left > this.Width - pictureBox1.Width/2) pictureBox1.Left = -pictureBox1.Width/2;
+
+            groupBox1.Left = pictureBox1.Left - (int)(groupBox1.Width / 3); 
+            
         }
 
         private void timer2_Tick(object sender, EventArgs e)
@@ -195,11 +229,29 @@ namespace WindowsFormsApplication4
             }
             pictureBox1.Left -= MoveValueL;
             if (pictureBox1.Left < -pictureBox1.Width/2) pictureBox1.Left = this.Width - pictureBox1.Width/2;
+         
+            groupBox1.Left = pictureBox1.Left - (int)(groupBox1.Width / 3);
         }
 
+       
         private void timer3_Tick(object sender, EventArgs e)
         {
          //   label8.Text = "" + (float)Height / 350;
+            if (slowbutton==1 && mute == 0)
+            {
+                WMP6.URL = @"res\slowbutton.wav";
+             //       WMP6.controls.play();
+            }
+            if (slowbutton == 1 && energy > 0 && pause == 0&&start==1) energy -= 10;
+            if (energy <= 0) { slowbutton = 0; energy = 0; label5.Text = "Энергия закончилась!"; CountTimer = 40; }
+            if (slowbutton == 0 && energy < 100 && pause == 0 && start == 1) energy++;
+            label9.Text = "Энергия: " + energy;
+            label10.Text = "" + energy;
+            label11.Text = "" + lives+" ";
+     //       label10.Left = pictureBox1.Left - 40;
+     //       label10.Top = pictureBox1.Top + 10;
+     //       label11.Left = pictureBox1.Left + (int)(pictureBox1.Width * 1.1);
+    //      label11.Top = pictureBox1.Top + 10;
             Random random = new Random(DateTime.Now.Second * DateTime.Now.Millisecond);
             kf = ((float)this.Width / Height) ;
             label4.Text = "Коэффициент сложности: " + Math.Round(kf*kf, 1);
@@ -211,14 +263,17 @@ namespace WindowsFormsApplication4
                 label3.Text = "Новый рекорд!";
                 CountTimer = 50;
                 newrecord = 1;
-                WMP5.URL = @"res\newrecord.wav";
-                WMP5.controls.play();
+                if (mute == 0)
+                {
+                    WMP5.URL = @"res\newrecord.wav";
+                    WMP5.controls.play();
+                }
             }
             kfs=(int)((kf*kf)/1.5);
             if (kfs < 1) kfs = 1;
             MoveValue = (2 + spd * kfs) + (int)((kf * kf) / 1.5);
             pictureBox5.Width =(int)(this.Width/8);
-            if (random.Next(0, 29)==1 && fly==0 && start==1&&pause==0) {
+            if (random.Next(0, 29)==1 && fly==0 && start==1&&pause==0&&difficult>=3) {
                 if (obuchenie == 1 || obuchenie == 2)
                 {
                     start = 0;
@@ -239,7 +294,7 @@ namespace WindowsFormsApplication4
                 fly = 1;
 
             }
-            if (random.Next(0, 15) == 2 && fly == 0 && start == 1&&pause==0)
+            if (random.Next(0, 15) == 2 && fly == 0 && start == 1&&pause==0&&difficult>=2)
             {
                 timer7.Start();
                 fly = 1;
@@ -264,8 +319,11 @@ namespace WindowsFormsApplication4
                 label5.Text = "Жизни - " + lives;
                 CountTimer = 50;
                 t4 = 0;
-                WMP2.URL = @"res\greenball.wav";
-                WMP2.controls.play();
+                if (mute == 0)
+                {
+                    WMP2.URL = @"res\greenball.wav";
+                    WMP2.controls.play();
+                }
                 timer4.Stop();
             }
             if (pictureBox3.Top > Height - 30) { 
@@ -280,24 +338,27 @@ namespace WindowsFormsApplication4
 
         private void timer5_Tick(object sender, EventArgs e)
         {
-     
+            
             if (timerbonuslive > 0)timerbonuslive--;
             else flagbonuslives = 0;
            // label8.Text = "" + timerbonuslive;
-            label6.Left = pictureBox1.Left;
-            label6.Top = pictureBox1.Top - 50;
+        //    label6.Left = pictureBox1.Left;
+        //    label6.Top = pictureBox1.Top - 50;
             if (CountTimer > 0) CountTimer--;
             if (CountTimer == 1) { label3.Text = ""; label5.Text = ""; } 
             Random random = new Random(DateTime.Now.Second*DateTime.Now.Millisecond);
             
             int popadanie=0;
-
-            pictureBox2.Top += 1 + difficult - slow + (int)(Height / 350);
+            if (slowbutton == 0) moveyelow = 1 + difficult - slow + (int)(Height / 350); else moveyelow = 2;
+            pictureBox2.Top += moveyelow;
             if (pictureBox2.Left > pictureBox1.Left -pictureBox1.Width*0.3 && pictureBox2.Left < pictureBox1.Left + pictureBox1.Width*0.8 &&
-                pictureBox2.Top > Height - 87 && pictureBox2.Top < Height - 53)
+                pictureBox2.Top > Height - 87 && pictureBox2.Top < Height - 55)
             {
-                WMP4.URL = @"res\yelowball.wav";
-                WMP4.controls.play();
+                if (mute == 0)
+                {
+                    WMP4.URL = @"res\yelowball.wav";
+                    WMP4.controls.play();
+                }
                 label6.Text = "+" + Math.Round(100 * kf * difficult, 0);
                 count++;
                 score = (score/(kf) + 100 * difficult)*(kf);
@@ -325,8 +386,11 @@ namespace WindowsFormsApplication4
                     lives--;
                     label5.Text = "Жизни - " + lives;
                     CountTimer = 30;
-                    WMP4.URL = @"res\mimo.wav";
-                    WMP4.controls.play();
+                    if (mute == 0)
+                    {
+                        WMP4.URL = @"res\mimo.wav";
+                        WMP4.controls.play();
+                    }
                 }
                 pictureBox2.Top = -50;
                 pictureBox2.Left = random.Next(0, this.Width - 50);
@@ -336,8 +400,11 @@ namespace WindowsFormsApplication4
             temp1 = count/10;
             if (temp1 > temp2)
             {
-                WMP2.URL = @"res\levelup.wav";
-                WMP2.controls.play();
+                if (mute == 0)
+                {
+                    WMP2.URL = @"res\levelup.wav";
+                    WMP2.controls.play();
+                }
                 temp2 = temp1;
                 difficult++;
                 label3.Text = "Уровень " + difficult;
@@ -370,8 +437,11 @@ namespace WindowsFormsApplication4
             {
                 fonsound.Stop();
                 start = 0;
-                WMP.URL = @"res\gameover.wav";
-                WMP.controls.play();
+                if (mute == 0)
+                {
+                    WMP.URL = @"res\gameover.wav";
+                    WMP.controls.play();
+                }
                 label3.Text="Вы проиграли!";
                 label5.Text = "";
                 timer1.Stop();
@@ -398,6 +468,7 @@ namespace WindowsFormsApplication4
                 var res = MessageBox.Show("Начать сначала?", "Вы проиграли!", MessageBoxButtons.YesNo);
                 if (res == DialogResult.Yes)
                 {
+                    slowbutton = 0;
                     flagbonuslives = 0;
                     timerbonuslive = 0;
                     kfs = 0;
@@ -409,6 +480,7 @@ namespace WindowsFormsApplication4
                     score = 0;
                     difficult=1;
                     lives = 3;
+                    energy = 100;
                     temp1 = 0;
                     temp2 = 0;
                     spd = 1;
@@ -469,8 +541,11 @@ namespace WindowsFormsApplication4
                 CountTimer = 50;
                 fly = 0;
                 t6 = 0;
-                WMP3.URL = @"res\redball.wav";
-                WMP3.controls.play();
+                if (mute == 0)
+                {
+                    WMP3.URL = @"res\redball.wav";
+                    WMP3.controls.play();
+                }
                 timer6.Stop();
             }
             if (pictureBox4.Top > Height - 30)
@@ -497,8 +572,11 @@ namespace WindowsFormsApplication4
                 label5.Text = "Потеря жизни";
                 CountTimer = 50;
                 fly = 0;
-                WMP3.URL = @"res\block.wav";
-                WMP3.controls.play();
+                if (mute == 0)
+                {
+                    WMP3.URL = @"res\block.wav";
+                    WMP3.controls.play();
+                }
                 t7 = 0;
                 if (flagbonuslives == 1)
                 {
@@ -525,9 +603,5 @@ namespace WindowsFormsApplication4
                 timer7.Stop();
             }
         }
-
-
-
-
     }
 }
